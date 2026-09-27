@@ -60,3 +60,22 @@ login/lock screens and remote unlocking are outside this prototype's scope.
 Changing the key on Windows disconnects the old pairing; enter the replacement
 on the Mac. The Copy button clears the current clipboard after one minute if it
 is unchanged, but it cannot erase clipboard history or already synced copies.
+
+## Permissions after a local Mac rebuild
+
+The local bundle is ad-hoc signed. Replacing it can invalidate its existing
+macOS permission records even while System Settings still shows the switches on.
+If SideBySide reports Required after a rebuild, quit it, remove only SideBySide
+from the Accessibility and Input Monitoring lists, then add the installed
+`~/Applications/SideBySide.app` again and enable it. Reopen SideBySide and verify
+both permissions and Input capture ready inside its Permissions page.
+
+If an obsolete entry cannot be removed through the list, these commands revoke
+only SideBySide's two records, after which it must be granted normally again:
+
+```sh
+tccutil reset Accessibility local.sidebyside.desktop
+tccutil reset ListenEvent local.sidebyside.desktop
+```
+
+Do not reset permissions globally or alter unrelated apps to repair this.

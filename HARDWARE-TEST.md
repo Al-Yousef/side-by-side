@@ -1,8 +1,9 @@
 # SideBySide hardware test
 
 Status on 27 September 2026: the Mac app builds and launches. Its packaged UI,
-TLS checks and 87 focused tests pass. All physical two-computer checks below
-are pending until observed on your Mac and Windows PC.
+TLS checks and 87 focused tests pass. Accessibility and Input Monitoring were
+verified by the running app, with its native input hook ready. All physical
+two-computer checks below are pending until observed on your Mac and Windows PC.
 
 ## Connect the computers
 

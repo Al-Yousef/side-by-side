@@ -36,8 +36,14 @@ Clone this repository and work from its root directory.
   key field, 0600 file permissions, 14 page renders and in-memory TLS 1.3
   exchange in both directions. No live settings, input hooks, LAN sockets or
   clipboard access. The build runs it and verifies local signature integrity.
-- Permission grants, authenticated LAN pairing and all physical input tests
-  remain unverified. Resume with [HARDWARE-TEST.md](HARDWARE-TEST.md).
+- Accessibility and Input Monitoring passed in the running bundle, with the
+  native input hook ready. Rebuilt ad-hoc signatures may require removing and
+  adding only SideBySide's permission entries again; see SETUP.md.
+- Removed conflicting required label-width constraints and corrected login
+  launch detection so other relaunches can show the control window.
+- The final rebuilt bundle still needs its permissions re-granted and a live
+  window check. Authenticated LAN pairing and all physical two-computer input
+  tests remain unverified. Resume with [HARDWARE-TEST.md](HARDWARE-TEST.md).
 
 ## Continue here
 

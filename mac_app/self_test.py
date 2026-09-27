@@ -61,6 +61,16 @@ def run(output_directory, ui):
     output.mkdir(parents=True, exist_ok=True)
     AppKit.NSApplication.sharedApplication()
     ui.theme.init_fonts()
+    # Build local descriptors only. No Apple events are sent to another app.
+    assert not ui.launched_as_login_item(None)
+    event = AppKit.NSAppleEventDescriptor.appleEventWithEventClass_eventID_targetDescriptor_returnID_transactionID_(
+        int.from_bytes(b"aevt", "big"), int.from_bytes(b"oapp", "big"), None, -1, 0)
+    assert not ui.launched_as_login_item(event)
+    for marker, expected in ((b"lgit", True), (b"svit", False)):
+        event.setParamDescriptor_forKeyword_(
+            AppKit.NSAppleEventDescriptor.descriptorWithEnumCode_(int.from_bytes(marker, "big")),
+            int.from_bytes(b"prop", "big"))
+        assert ui.launched_as_login_item(event) is expected
     key = secure_transport.new_key()
     tls_version = check_tls(key)
     rendered = []
@@ -118,6 +128,7 @@ def run(output_directory, ui):
         "tls": tls_version,
         "has_psk": ssl.HAS_PSK,
         "pages_rendered": rendered,
+        "login_launch_detection": True,
         "key_masked": True,
         "settings_mode": "0600",
         "live_settings_used": False,

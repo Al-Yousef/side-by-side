@@ -154,7 +154,7 @@ def eyebrow(text, ink="ink_3"):
 
 def note(text="", ink="ink_2", align=None):
     label = Label(text, theme.TYPE["note"], ink=ink, wrap=True, align=align)
-    label.view.widthAnchor().constraintLessThanOrEqualToConstant_(theme.READING_WIDTH).setActive_(True)
+    label.view.setPreferredMaxLayoutWidth_(theme.READING_WIDTH)
     return label
 
 

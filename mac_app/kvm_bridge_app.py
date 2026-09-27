@@ -764,6 +764,7 @@ class ControlWindow(AppKit.NSObject):
         # Set by TrayApp: saves one direction's switch, as its menu ticks do.
         self.direction_handler = None
         self.last_capture_attempt = 0.0
+        self.last_permission_state = None
         # macOS passes keys only to a process started after Input Monitoring is granted, so a grant
         # made during this run needs a relaunch before the keyboard crosses, however ready the tap looks.
         self.granted_at_launch = accessibility_granted() and input_monitoring_granted()
@@ -1174,7 +1175,7 @@ class ControlWindow(AppKit.NSObject):
         self.page_titles.append(heading)
         widgets.add(header, heading.view)
         purpose_label = widgets.Label(purpose, theme.TYPE["body"], ink="ink_2", wrap=True)
-        purpose_label.view.widthAnchor().constraintLessThanOrEqualToConstant_(theme.READING_WIDTH).setActive_(True)
+        purpose_label.view.setPreferredMaxLayoutWidth_(theme.READING_WIDTH)
         widgets.add(header, purpose_label.view)
         widgets.add(body, header)
         body.setCustomSpacing_afterView_(32, header)
@@ -1614,7 +1615,7 @@ class ControlWindow(AppKit.NSObject):
             "port 24830 and that same key.").view)
         self.pair_status = widgets.note("The connection uses authenticated TLS 1.3.")
         widgets.add(instructions, self.pair_status.view)
-        widgets.add(instructions, widgets.Button("Open Connection", self, "confirmPair:", style="primary").view)
+        widgets.add(instructions, widgets.Button("Open Connection", self, "confirmPair:", style="primary", full_width=True).view)
         self.pair_grid.addArrangedSubview_(instructions)
         module.add(self.pair_grid)
         self.pair_stacked = [instructions.widthAnchor().constraintEqualToAnchor_(self.pair_grid.widthAnchor())]
@@ -1957,6 +1958,13 @@ class ControlWindow(AppKit.NSObject):
                 self.last_capture_attempt = now
                 controller.start_input_capture()
         needs_relaunch = access and listening and not self.granted_at_launch
+        permission_state = (access, listening, controller.input_ready, needs_relaunch)
+        if permission_state != self.last_permission_state:
+            self.last_permission_state = permission_state
+            self.logger.info(
+                "permissions: accessibility=%s input_monitoring=%s capture_ready=%s relaunch_needed=%s",
+                *permission_state,
+            )
         self.relaunch_button.view.setHidden_(not needs_relaunch)
         if needs_relaunch:
             self.capture_status.set("Both granted. Relaunch SideBySide so macOS passes it the keyboard.", ink="amber")
@@ -2058,9 +2066,16 @@ class StatusItemClick(AppKit.NSObject):
         item.setMenu_(None)
 
 
+def launched_as_login_item(event):
+    """Only the login-item Apple event should suppress the setup window."""
+    if event is None or event.eventID() != int.from_bytes(b"oapp", "big"):
+        return False
+    launch = event.paramDescriptorForKeyword_(int.from_bytes(b"prop", "big"))
+    return launch is not None and launch.enumCodeValue() == int.from_bytes(b"lgit", "big")
+
+
 class _LaunchWatch(AppKit.NSObject):
-    """A login item takes no arguments, so a login launch is recognised instead: macOS marks it
-    as not the default launch, and that is the cue to stay in the menu bar."""
+    """Keep actual login launches in the menu bar, while normal relaunches show setup."""
 
     def initWithTray_(self, tray):
         self = objc.super(_LaunchWatch, self).init()
@@ -2071,10 +2086,12 @@ class _LaunchWatch(AppKit.NSObject):
         return self
 
     def launched_(self, note):
-        info = note.userInfo() or {}
-        default = info.get("NSApplicationLaunchIsDefaultLaunchKey")
-        if default is not None and not bool(default):
+        # A non-default launch can also be a restored session or a service.
+        # Use the explicit login-item marker instead of hiding all such launches.
+        event = AppKit.NSAppleEventManager.sharedAppleEventManager().currentAppleEvent()
+        if launched_as_login_item(event):
             self.tray.hidden = True
+        self.tray.logger.info("startup: show_window=%s", not self.tray.hidden)
 
 
 class TrayApp(rumps.App):

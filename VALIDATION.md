@@ -74,7 +74,22 @@ Native rendering exposed a content view that collapsed to its fitting width
 while the window frame retained its requested width. Binding its width to the
 window content layout guide corrected this; the packaged test now asserts the
 actual content dimensions after layout on every page. Pairing's obsolete
-short-code instruction was also corrected.
+short-code instruction was also corrected. Reading-width hints no longer add
+required constraints that conflict with wider windows, and the full-width
+Open Connection button no longer has a conflicting fixed-width constraint.
+The startup check now uses the explicit login-item Apple event, rather than
+treating every non-default
+launch as a reason to hide the window; the packaged self-test checks normal,
+login and service launch descriptors.
+
+Accessibility and Input Monitoring were granted on the physical Mac. The running
+bundle reported both granted, `capture_ready=True` and `relaunch_needed=False`.
+This confirms installation of the native input hook, not successful remote input.
+Replacing an ad-hoc-signed build left stale permission records: macOS rejected
+the old code requirement even when the switches showed on. Removing those
+SideBySide entries and granting the installed build again restored access.
+Permission diagnostics log only booleans, never keys or input contents. The
+final startup-fix rebuild still needs re-granting and a live window check.
 
 `codesign --verify --deep --strict` passed for the locally ad-hoc-signed bundle.
 This does not establish Developer ID signing, notarization or a security audit.
@@ -82,7 +97,7 @@ The production secure transport, framing and receiver modules are unchanged.
 
 ## Remaining
 
-Accessibility/Input Monitoring grants, authenticated LAN pairing, real
+Authenticated LAN pairing, real
 mouse/keyboard and Mac-to-Windows gestures across both physical computers,
 actual LAN latency, clipboard images across the LAN, multi-monitor scaling,
 sleep/wake and reconnects still need device testing. Native Windows-to-Mac
