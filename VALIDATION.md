@@ -97,6 +97,25 @@ confirmed `show_window=True`, both grants, and capture readiness after relaunch.
 This does not establish Developer ID signing, notarization or a security audit.
 The production secure transport, framing and receiver modules are unchanged.
 
+## Windows sender address-lookup follow-up
+
+A setup attempt exposed a missing local-address helper in the manual pairing
+adapter. The Windows sender's self-connection guard still called that helper,
+preventing it from learning or connecting to the Mac. Local address enumeration
+is restored in both pairing adapters without restoring broadcast discovery or
+network pairing. The Mac and Windows adapters remain byte-for-byte identical.
+
+On top of the Mac build and relaunch fixes, all 40 focused Windows sender and
+secure-link tests pass: 29 sender checks and 11 TLS/receiver checks, including
+the shared-module parity check. Two new sender regressions exercise the actual
+pairing adapter's address lookup and its hostname-failure fallback. These are
+two additional tests beyond the original 68 Windows checks above.
+
+The Windows executable containing this helper fix also passed its packaged
+TLS loopback and seven-page UI self-test. A diagnostic runtime start confirmed
+input-hook readiness and four sender workers. This does not establish that
+input can reach or control the physical Mac; the LAN test remains blocked.
+
 ## Remaining
 
 Authenticated LAN pairing, real mouse/keyboard and Mac-to-Windows gestures across both physical computers,

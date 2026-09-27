@@ -20,3 +20,15 @@ def local_address_towards(address):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         sock.connect((address, 24830))
         return sock.getsockname()[0]
+
+def _local_ipv4_addresses():
+    """Keep the sender's self-connection guard working without discovery."""
+    found = []
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            address = info[4][0]
+            if not address.startswith("127.") and address not in found:
+                found.append(address)
+    except OSError:
+        pass
+    return found

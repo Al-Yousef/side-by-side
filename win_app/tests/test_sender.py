@@ -6,6 +6,7 @@ import socket
 import threading
 import time
 import unittest
+from unittest.mock import patch
 
 import capture_win
 import protocol
@@ -155,6 +156,17 @@ class SelfConnectionTests(unittest.TestCase):
 
     def test_the_macs_address_is_not(self):
         self.assertFalse(sender.is_this_machine("192.168.1.5", ["192.168.1.3"], address_towards=lambda host: "192.168.1.3"))
+
+    def test_manual_pairing_keeps_the_real_address_lookup_available(self):
+        records = [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("192.168.1.3", 0))]
+        with patch("socket.getaddrinfo", return_value=records):
+            self.assertTrue(sender.is_this_machine("192.168.1.3"))
+            self.assertFalse(sender.is_this_machine("192.168.1.5", address_towards=lambda host: "192.168.1.3"))
+
+    def test_real_address_lookup_failure_still_checks_the_route(self):
+        with patch("socket.getaddrinfo", side_effect=socket.gaierror("hostname unavailable")):
+            self.assertTrue(sender.is_this_machine("192.168.1.3", address_towards=lambda host: host))
+            self.assertFalse(sender.is_this_machine("192.168.1.5", address_towards=lambda host: "192.168.1.3"))
 
     def test_this_pcs_own_real_address_is_not_missed_when_enumeration_fails(self):
         # local_addresses=[] is what pairing._local_ipv4_addresses() returns
