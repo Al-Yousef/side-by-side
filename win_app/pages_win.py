@@ -1,0 +1,44 @@
+"""The control window's pages, and which carry a dot in the sidebar.
+
+Pure, so the rules are tested without Qt.
+"""
+
+from __future__ import annotations
+
+# (key, name, what the page is for), in sidebar order; Ctrl+1 is the first.
+PAGES = (
+    ("overview", "Overview",
+     "Where input is right now, and the controls you reach for every day."),
+    ("crossing", "Crossing",
+     "How input leaves this PC: the ways in, the arrangement with your Mac, and how hard the edge "
+     "pushes back first."),
+    ("design", "Design",
+     "How crossing looks on this PC: the light along the edge that leads to your Mac. Every "
+     "change applies as you make it."),
+    ("keyboard", "Keyboard",
+     "The key that sends input to your Mac, the keys and buttons that stay on this PC, and how its "
+     "Ctrl and Windows keys arrive on the Mac."),
+    ("pairing", "Pairing",
+     "Generate a private key, then enter it on your Mac to connect your computers."),
+    ("connection", "Connection",
+     "Connection settings and the Mac address learned after authentication."),
+    ("firewall", "Firewall",
+     "Windows Firewall must let SideBySide through before a Mac can connect."),
+)
+KEYS = tuple(page[0] for page in PAGES)
+
+
+def dots(config_error: bool, firewall_tone: str | None) -> dict:
+    """Page key to the tone of its sidebar dot, for the pages that need one.
+
+    `firewall_tone` is the note tone the Firewall page is already showing -- "note" is its
+    healthy end-state (the button just offers a manual re-check), so only "note-amber" and
+    "note-fault" earn a dot; a plain boolean would also mark the healthy state."""
+    marks = {}
+    if config_error:
+        marks["connection"] = "fault"
+    if firewall_tone == "note-amber":
+        marks["firewall"] = "amber"
+    elif firewall_tone == "note-fault":
+        marks["firewall"] = "fault"
+    return marks

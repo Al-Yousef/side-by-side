@@ -1,0 +1,31 @@
+config.json
+*.log
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+.DS_Store
+
+
+# Build output. Never committed and never left behind either: a .app under dist/ is indexed by
+# Spotlight and turns up in Launchpad beside the real /Applications install.
+win_app/Output/
+win_app/build/
+win_app/dist/
+mac_app/build/
+mac_app/dist/
+
+
+# Rendered on demand from docs/*.html; reaches the other machine via Syncthing
+docs/pdf/
+
+.venv-win/
+.venv-mac/
+windows/
+build/
+dist/
+test-renders/
+
+# Generated for downloadable source bundles, not a source-controlled manifest.
+SOURCE-SHA256.json
