@@ -78,8 +78,7 @@ short-code instruction was also corrected. Reading-width hints no longer add
 required constraints that conflict with wider windows, and the full-width
 Open Connection button no longer has a conflicting fixed-width constraint.
 The startup check now uses the explicit login-item Apple event, rather than
-treating every non-default
-launch as a reason to hide the window; the packaged self-test checks normal,
+treating every non-default launch as a reason to hide the window; the packaged self-test checks normal,
 login and service launch descriptors.
 
 Accessibility and Input Monitoring were granted on the physical Mac. The running
@@ -89,7 +88,10 @@ Replacing an ad-hoc-signed build left stale permission records: macOS rejected
 the old code requirement even when the switches showed on. Removing those
 SideBySide entries and granting the installed build again restored access.
 Permission diagnostics log only booleans, never keys or input contents. The
-final startup-fix rebuild still needs re-granting and a live window check.
+final installed build was re-granted both permissions and reopened successfully.
+Its native Permissions page showed both Granted and Input capture ready; its
+Connection page opened with a masked key field. Runtime logging independently
+confirmed `show_window=True`, both grants, and capture readiness after relaunch.
 
 `codesign --verify --deep --strict` passed for the locally ad-hoc-signed bundle.
 This does not establish Developer ID signing, notarization or a security audit.
@@ -97,8 +99,7 @@ The production secure transport, framing and receiver modules are unchanged.
 
 ## Remaining
 
-Authenticated LAN pairing, real
-mouse/keyboard and Mac-to-Windows gestures across both physical computers,
+Authenticated LAN pairing, real mouse/keyboard and Mac-to-Windows gestures across both physical computers,
 actual LAN latency, clipboard images across the LAN, multi-monitor scaling,
 sleep/wake and reconnects still need device testing. Native Windows-to-Mac
 trackpad gestures are not implemented (`input_injector_mac.inject_gesture`

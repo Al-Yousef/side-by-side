@@ -41,9 +41,10 @@ Clone this repository and work from its root directory.
   adding only SideBySide's permission entries again; see SETUP.md.
 - Removed conflicting required label-width constraints and corrected login
   launch detection so other relaunches can show the control window.
-- The final rebuilt bundle still needs its permissions re-granted and a live
-  window check. Authenticated LAN pairing and all physical two-computer input
-  tests remain unverified. Resume with [HARDWARE-TEST.md](HARDWARE-TEST.md).
+- Verified the final installed build after granting both permissions: it
+  reopens its window, reports Input capture ready, and opens Connection.
+  Authenticated LAN pairing and all physical two-computer input tests remain
+  unverified. Resume with [HARDWARE-TEST.md](HARDWARE-TEST.md).
 
 ## Continue here
 
