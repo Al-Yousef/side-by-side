@@ -12,9 +12,14 @@ if [[ ! -x "$PYTHON" ]]; then
 fi
 "$PYTHON" -c 'import sys,ssl; assert sys.version_info >= (3,13) and ssl.HAS_PSK, "Python 3.13+ with TLS-PSK is required"'
 "$PYTHON" -m venv .venv-mac
-.venv-mac/bin/python -m pip install -r mac_app/requirements-mac.txt
+.venv-mac/bin/python -m pip install -r requirements-mac.lock
+.venv-mac/bin/python -m pip check
 .venv-mac/bin/python tests/test_secure_link.py
+.venv-mac/bin/python tests/test_mac_transport.py
 cd mac_app
+../.venv-mac/bin/python -m unittest discover -s tests -p test_gestures.py
 ../.venv-mac/bin/python setup.py py2app
+dist/SideBySide.app/Contents/MacOS/SideBySide --self-test "$PWD/dist/self-test"
+/usr/bin/codesign --verify --deep --strict dist/SideBySide.app
 echo "Built mac_app/dist/SideBySide.app. Copy it to ~/Applications, then open it."
 echo "Grant Accessibility and Input Monitoring to SideBySide, then reopen the app."

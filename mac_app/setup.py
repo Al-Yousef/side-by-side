@@ -40,6 +40,7 @@ setup(
         "receiver",
         "return_edge",
         "settings_store",
+        "self_test",
         "theme",
         "tokens",
         "wake",

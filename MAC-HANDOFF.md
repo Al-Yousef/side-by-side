@@ -2,8 +2,9 @@
 
 SideBySide is an experimental Beamer-derived Windows/Mac mouse and keyboard
 sharing app. Its interface and gesture code are retained while the connection
-uses mandatory authenticated TLS. Windows checks have passed; an Apple silicon
-Mac running macOS 13+ is needed to build and validate the native Mac app.
+uses mandatory authenticated TLS. Windows checks have passed. The Mac app has
+now built and launched on an Apple silicon Mac running macOS 26.6.2; physical
+pairing/input checks remain.
 Clone this repository and work from its root directory.
 
 ## Already done on Windows, 27 September 2026
@@ -24,6 +25,19 @@ Clone this repository and work from its root directory.
   native APIs faked on Windows. This is **not** a real Mac gesture/UI test.
 - Built the Windows exe and kept the full source. Windows settings are stored
   in `%LOCALAPPDATA%\SideBySide`; Mac uses `~/Library/Application Support/SideBySide`.
+
+## Mac progress, 27 September 2026
+
+- Python.org 3.13.15 / OpenSSL 3.0.21, TLS-PSK available, ARM64 execution.
+- Built and launched the standalone bundle; saved `requirements-mac.lock`.
+- Fixed the native content view shrinking below the requested window width.
+- Corrected an obsolete short-code instruction on Pairing.
+- Added `--self-test OUTPUT_DIRECTORY`: temporary synthetic settings, masked
+  key field, 0600 file permissions, 14 page renders and in-memory TLS 1.3
+  exchange in both directions. No live settings, input hooks, LAN sockets or
+  clipboard access. The build runs it and verifies local signature integrity.
+- Permission grants, authenticated LAN pairing and all physical input tests
+  remain unverified. Resume with [HARDWARE-TEST.md](HARDWARE-TEST.md).
 
 ## Continue here
 

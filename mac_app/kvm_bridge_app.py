@@ -805,6 +805,11 @@ class ControlWindow(AppKit.NSObject):
         self.window.setTitlebarAppearsTransparent_(True)
         self.window.center()
         content = self.window.contentView()
+        # NSStackView's fitting width can shrink the content independently of
+        # the window frame. Keep it tied to the window when pages relayout.
+        content.widthAnchor().constraintEqualToAnchor_(
+            self.window.contentLayoutGuide().widthAnchor()
+        ).setActive_(True)
         content.setWantsLayer_(True)
         content.layer().setBackgroundColor_(theme.colour("ground").CGColor())
 
@@ -959,7 +964,7 @@ class ControlWindow(AppKit.NSObject):
         self.port_field.setStringValue_(str(raw["port"]))
         self.token_field.setStringValue_(str(raw["auth_token"]))
         self.token_plain.setStringValue_(str(raw["auth_token"]))
-        self._say_pairing("Choose a PC, then type the code it shows.")
+        self._say_pairing("Enter the Windows address and 64-character pairing key on Connection.")
         self.key_recorder.set_value(raw["trigger_key"])
         self.ignored_entries = list(raw["ignored_inputs"])
         self._render_ignored()
@@ -2332,6 +2337,8 @@ def parse_args(argv=None):
         help="config path; defaults to ~/Library/Application Support/SideBySide/config.json",
     )
     parser.add_argument("--hidden", action="store_true", help="start in the menu bar without opening the window")
+    parser.add_argument("--self-test", metavar="OUTPUT_DIRECTORY",
+                        help="check the bundled UI and TLS without live settings, input hooks or LAN access")
     return parser.parse_args(argv)
 
 
@@ -2339,6 +2346,17 @@ def main(argv=None):
     args = parse_args(argv)
     if sys.platform != "darwin":
         raise SystemExit("SideBySide must run on macOS")
+    if args.self_test:
+        try:
+            from self_test import run
+            result = run(args.self_test, sys.modules[__name__])
+        except Exception:
+            # A build check must fail in the terminal, not wait on py2app's
+            # graphical launch-error dialog.
+            import traceback
+            traceback.print_exc()
+            raise SystemExit(1)
+        raise SystemExit(result)
     instance_lock = acquire_instance_lock()
     if instance_lock is None:
         return

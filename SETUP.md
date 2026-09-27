@@ -1,7 +1,8 @@
 # Set up Side by Side
 
-The Windows prototype is ready for local testing. The Mac build and real
-two-computer check are still pending. Keep the original Beamer app closed.
+Both apps have passed local build checks. The Mac app has launched on Apple
+silicon; real two-computer checks are still pending. Keep the original Beamer
+app closed.
 
 ## Windows
 
@@ -47,7 +48,10 @@ Use an empty text editor on each machine. Check mouse movement, click, scroll,
 typing, modifier release, crossing out and back, and plain-text clipboard in
 both directions. Then check the Mac gestures you use. Disconnect Wi-Fi briefly:
 input should return locally and reconnect afterward. Check sleep/wake last.
-These real-device checks have not yet been performed for this build.
+Use [HARDWARE-TEST.md](HARDWARE-TEST.md) to record these checks. Native
+Windows-to-Mac trackpad gestures are not implemented. Clipboard transfer occurs
+on input handoff, so cross to the destination before pasting. These real-device
+checks have not yet been performed for this build.
 
 Close-window hides the Windows app to the tray; use **Quit** to end it. You can
 turn off either sharing direction in the app. Elevated Windows apps, UAC prompts,
